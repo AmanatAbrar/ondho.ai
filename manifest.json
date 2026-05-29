@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Ondho.ai - Removing the Blindfold",
+  "version": "1.0",
+  "description": "AI-powered trust scoring for Bangladeshi news.",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
