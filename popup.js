@@ -30,7 +30,7 @@ function scrapeArticle() {
 // This function sends the data to your Cloudflare Worker
 async function analyzeArticle(articleData) {
   // ABRAR WILL UPDATE THIS URL LATER
-  const WORKER_URL = "https://your-worker-url.workers.dev"; 
+  const WORKER_URL = "https://ondho-backend.amanatabrar213.workers.dev/"; 
 
   try {
     const response = await fetch(WORKER_URL, {
