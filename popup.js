@@ -52,7 +52,8 @@ async function analyzeArticle(articleData) {
     document.getElementById('bias-dir').innerText = bias;
     document.getElementById('sens-level').innerText = sens;
     document.getElementById('headline-match').innerText = match;
-    document.getElementById('ai-reason').innerText = reason;
+        // TEMPORARY: Show the whole AI response on screen so we can see it
+    document.getElementById('ai-reason').innerText = JSON.stringify(data);
 
   } catch (error) {
     document.getElementById('loading-section').innerText = "Error connecting to AI: " + error.message;
