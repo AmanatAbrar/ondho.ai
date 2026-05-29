@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  // Get the current active tab
   let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-  // Execute a script in the tab to grab the headline and body text
   chrome.scripting.executeScript({
     target: { tabId: tab.id },
     function: scrapeArticle,
@@ -16,21 +14,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 });
 
-// This function runs IN the webpage, not the extension
 function scrapeArticle() {
   let headline = document.querySelector('h1')?.innerText || "No headline found";
-  // Grab the first 2000 characters of paragraphs to avoid crashing
   let bodyText = "";
   document.querySelectorAll('p').forEach(p => bodyText += p.innerText + " ");
   bodyText = bodyText.substring(0, 2000); 
-  
   return { headline, bodyText };
 }
 
-// This function sends the data to your Cloudflare Worker
 async function analyzeArticle(articleData) {
-  // ABRAR WILL UPDATE THIS URL LATER
-  const WORKER_URL = "https://ondho-backend.amanatabrar213.workers.dev/"; 
+  const WORKER_URL = "https://ondho-backend.amanatabrar213.workers.dev/"; // YOUR URL HERE
 
   try {
     const response = await fetch(WORKER_URL, {
@@ -40,19 +33,29 @@ async function analyzeArticle(articleData) {
     });
 
     const data = await response.json();
+    
+    // LOG THE DATA SO WE CAN SEE EXACTLY WHAT THE AI SENT
+    console.log("AI Response:", data);
 
-    // Update the UI with the AI response
     document.getElementById('loading-section').style.display = 'none';
     document.getElementById('results-section').style.display = 'block';
 
-    document.getElementById('trust-score').innerText = data.trust_score;
-    document.getElementById('bias-dir').innerText = data.bias_direction;
-    document.getElementById('sens-level').innerText = data.sensationalism_level;
-    document.getElementById('headline-match').innerText = data.headline_body_match;
-    document.getElementById('ai-reason').innerText = data.ai_reasoning;
+    // SMART EXTRACTION: If the AI uses a different key name, we catch it!
+    // (e.g., if it uses "score" instead of "trust_score")
+    const score = data.trust_score || data.score || data.trustScore || "N/A";
+    const bias = data.bias_direction || data.bias || data.biasDirection || "N/A";
+    const sens = data.sensationalism_level || data.sensationalism || data.sensationalismLevel || "N/A";
+    const match = data.headline_body_match || data.match || data.headlineMatch || "N/A";
+    const reason = data.ai_reasoning || data.reasoning || data.reason || data.ai_insight || "N/A";
+
+    document.getElementById('trust-score').innerText = score;
+    document.getElementById('bias-dir').innerText = bias;
+    document.getElementById('sens-level').innerText = sens;
+    document.getElementById('headline-match').innerText = match;
+    document.getElementById('ai-reason').innerText = reason;
 
   } catch (error) {
-    document.getElementById('loading-section').innerText = "Error connecting to AI.";
+    document.getElementById('loading-section').innerText = "Error connecting to AI: " + error.message;
     console.error(error);
   }
 }
